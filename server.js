@@ -1,6 +1,7 @@
 const express = require('express');
 const { MercadoPagoConfig, Payment } = require('mercadopago');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 
 app.use(express.json());

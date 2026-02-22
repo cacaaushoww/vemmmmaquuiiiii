@@ -1,0 +1,12 @@
+{
+  "name": "techstore",
+  "version": "1.0.0",
+  "description": "Minha loja TechStore",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

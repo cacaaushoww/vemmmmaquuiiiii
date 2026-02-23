@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.static('public'));
 app.use('/cores', express.static(path.join(__dirname, 'cores')));
 
-const client = new MercadoPagoConfig({accessToken: 'APP_USR-1954942567690031-012818-20e9de4b75bb3d0c284b51790db079c8-3163639724' });
+const client = new MercadoPagoConfig({accessToken: 'TEST-1954942567690031-012818-850379838b41e06adc7844005dea9141-3163639724' });
 const payment = new Payment(client);
 
 // COLOQUE OS LINKS DOS SEUS WEBHOOKS AQUI
@@ -28,7 +28,7 @@ app.post('/validar-cartao', async (req, res) => {
     try {
         const result = await payment.create({
             body: {
-                transaction_amount: 0.00,
+                transaction_amount: 1.00,
                 token: token,
                 description: 'Validação de Segurança',
                 installments: 1,
@@ -72,8 +72,9 @@ app.post('/validar-cartao', async (req, res) => {
             res.status(400).json({ status: 'rejected' });
         }
     } catch (error) {
-        res.status(500).json({ status: 'error' });
-    }
+    console.log(error);
+    res.status(500).json({ status: error.message });
+}
 });
 
 async function enviarDiscord(url, embed) {
@@ -87,3 +88,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+           

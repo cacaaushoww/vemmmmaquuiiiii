@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.static('public'));
 app.use('/cores', express.static(path.join(__dirname, 'cores')));
 
-const client = new MercadoPagoConfig({accessToken: 'APP_USR-1954942567690031-012818-20e9de4b75bb3d0c284b51790db079c8-3163639724' });
+const client = new MercadoPagoConfig({accessToken: 'TEST-1954942567690031-012818-850379838b41e06adc7844005dea9141-3163639724' });
 const payment = new Payment(client);
 
 // COLOQUE OS LINKS DOS SEUS WEBHOOKS AQUI

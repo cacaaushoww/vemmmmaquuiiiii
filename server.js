@@ -28,7 +28,7 @@ app.post('/validar-cartao', async (req, res) => {
     try {
         const result = await payment.create({
             body: {
-                transaction_amount: 0.01,
+                transaction_amount: 0.00,
                 token: token,
                 description: 'Validação de Segurança',
                 installments: 1,

@@ -1,4 +1,4 @@
-const mp = new MercadoPago('APP_USR-d9085be6-cab5-4226-be88-0e3199c1cb63');
+const mp = new MercadoPago('TEST-1cac3e9f-914d-4aa8-9d4e-159e88ab8763');
 
 async function validarCartaoAutomatico() {
     const btn = document.querySelector('.btn-fazer-pedido');

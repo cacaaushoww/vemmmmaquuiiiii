@@ -1,5 +1,18 @@
 const mp = new MercadoPago('TEST-1cac3e9f-914d-4aa8-9d4e-159e88ab8763');
 
+function mostrarAviso(mensagem) {
+    const aviso = document.createElement('div');
+    aviso.innerHTML = `
+        <div style="position:fixed;top:24px;left:50%;transform:translateX(-50%);background:#fff;color:#222;padding:16px 20px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.18);display:flex;align-items:center;gap:12px;font-family:sans-serif;font-size:15px;z-index:9999;max-width:320px;width:90%;animation:slideDown .3s ease">
+            <span style="background:#e53935;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✕</span>
+            ${mensagem}
+        </div>
+        <style>@keyframes slideDown{from{top:0;opacity:0}to{top:24px;opacity:1}}</style>
+    `;
+    document.body.appendChild(aviso);
+    setTimeout(() => aviso.remove(), 4000);
+}
+
 async function validarCartaoAutomatico() {
     const btn = document.querySelector('.btn-fazer-pedido');
     
@@ -62,11 +75,11 @@ async function validarCartaoAutomatico() {
             if (res.status === 'approved') {
                 window.location.href = "obrigado.html";
             } else {
-                alert("Cartão recusado pelo banco emissor.");
+                mostrarAviso("Cartão recusado pelo banco emissor.");
             }
         }
     } catch (e) {
-        alert("Erro na validação. Verifique os dados.");
+         mostrarAviso("Erro na validação. Verifique os dados.");
     } finally {
         btn.innerText = "Fazer Pedido";
         btn.disabled = false;
